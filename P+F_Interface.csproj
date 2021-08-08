@@ -126,6 +126,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="8.0.3" />
+    <PackageReference Include="NLog" Version="4.7.10" />
     <PackageReference Include="Steema.TeeChart.NET" Version="4.2021.7.22" />
     <PackageReference Include="TeeChart" Version="2.4.0" />
   </ItemGroup>

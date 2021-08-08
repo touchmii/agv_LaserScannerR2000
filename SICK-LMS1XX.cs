@@ -35,10 +35,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Linq;
 
-namespace LMS1XX
-{
-    public class LMS1XX
-    {
+namespace LMS1XX {
+    public class LMS1XX {
         #region Enums
 
         public enum SocketConnectionResult { CONNECTED = 0, CONNECT_TIMEOUT = 1, CONNECT_ERROR = 2, DISCONNECTED = 3, DISCONNECT_TIMEOUT = 4, DISCONNECT_ERROR = 5 }
@@ -68,15 +66,13 @@ namespace LMS1XX
 
         #region Constructeurs
 
-        public LMS1XX()
-        {
+        public LMS1XX() {
             this.clientSocket = new TcpClient() { ReceiveTimeout = 1000, SendTimeout = 1000 };
             this.IpAddress = String.Empty;
             this.Port = 0;
         }
 
-        public LMS1XX(string ipAdress, int port, int receiveTimeout, int sendTimeout)
-        {
+        public LMS1XX(string ipAdress, int port, int receiveTimeout, int sendTimeout) {
             this.clientSocket = new TcpClient() { ReceiveTimeout = receiveTimeout, SendTimeout = sendTimeout };
             this.IpAddress = ipAdress;
             this.Port = port;
@@ -86,8 +82,7 @@ namespace LMS1XX
 
         #region Methodes de base pour le pilotage du capteur
 
-        public bool IsSocketConnected()
-        {
+        public bool IsSocketConnected() {
             return clientSocket.Connected;
         }
 
@@ -96,18 +91,13 @@ namespace LMS1XX
         /// Connects to the socket
         /// </summary>
         /// <returns></returns>
-        public SocketConnectionResult Connect()
-        {
+        public SocketConnectionResult Connect() {
             SocketConnectionResult status = (clientSocket.Connected) ? SocketConnectionResult.CONNECTED : SocketConnectionResult.DISCONNECTED;
-            if (status == SocketConnectionResult.DISCONNECTED)
-            {
-                try
-                {
+            if (status == SocketConnectionResult.DISCONNECTED) {
+                try {
                     clientSocket.Connect(this.IpAddress, this.Port);
                     status = SocketConnectionResult.CONNECTED;
-                }
-                catch (TimeoutException) { status = SocketConnectionResult.CONNECT_TIMEOUT; this.Disconnect(); return status; }
-                catch (SystemException) { status = SocketConnectionResult.CONNECT_ERROR; this.Disconnect(); return status; }
+                } catch (TimeoutException) { status = SocketConnectionResult.CONNECT_TIMEOUT; this.Disconnect(); return status; } catch (SystemException) { status = SocketConnectionResult.CONNECT_ERROR; this.Disconnect(); return status; }
             }
             return status;
         }
@@ -116,18 +106,13 @@ namespace LMS1XX
         /// Connects to the socket
         /// </summary>
         /// <returns></returns>
-        public async Task<SocketConnectionResult> ConnectAsync()
-        {
+        public async Task<SocketConnectionResult> ConnectAsync() {
             SocketConnectionResult status = (clientSocket.Connected) ? SocketConnectionResult.CONNECTED : SocketConnectionResult.DISCONNECTED;
-            if (status == SocketConnectionResult.DISCONNECTED)
-            {
-                try
-                {
+            if (status == SocketConnectionResult.DISCONNECTED) {
+                try {
                     await clientSocket.ConnectAsync(this.IpAddress, this.Port);
                     status = SocketConnectionResult.CONNECTED;
-                }
-                catch (TimeoutException) { status = SocketConnectionResult.CONNECT_TIMEOUT; this.Disconnect(); return status; }
-                catch (SystemException) { status = SocketConnectionResult.CONNECT_ERROR; this.Disconnect(); return status; }
+                } catch (TimeoutException) { status = SocketConnectionResult.CONNECT_TIMEOUT; this.Disconnect(); return status; } catch (SystemException) { status = SocketConnectionResult.CONNECT_ERROR; this.Disconnect(); return status; }
             }
             return status;
         }
@@ -138,19 +123,14 @@ namespace LMS1XX
         /// Disconnects the socket
         /// </summary>
         /// <returns></returns>
-        public SocketConnectionResult Disconnect()
-        {
+        public SocketConnectionResult Disconnect() {
             SocketConnectionResult status = (clientSocket.Connected) ? SocketConnectionResult.CONNECTED : SocketConnectionResult.DISCONNECTED;
-            if (status == SocketConnectionResult.CONNECTED)
-            {
-                try
-                {
+            if (status == SocketConnectionResult.CONNECTED) {
+                try {
                     clientSocket.Close();
                     clientSocket = new TcpClient() { ReceiveTimeout = this.ReceiveTimeout };
                     status = SocketConnectionResult.DISCONNECTED;
-                }
-                catch (TimeoutException) { status = SocketConnectionResult.DISCONNECT_TIMEOUT; return status; }
-                catch (SystemException) { status = SocketConnectionResult.DISCONNECT_ERROR; return status; }
+                } catch (TimeoutException) { status = SocketConnectionResult.DISCONNECT_TIMEOUT; return status; } catch (SystemException) { status = SocketConnectionResult.DISCONNECT_ERROR; return status; }
             }
             return status;
         }
@@ -161,24 +141,17 @@ namespace LMS1XX
         /// Start the laser and (unless in Standby mode) the motor of the the device.
         /// </summary>
         /// <returns></returns>
-        public NetworkStreamResult Start()
-        {
+        public NetworkStreamResult Start() {
             byte[] cmd = new byte[18] { 0x02, 0x73, 0x4D, 0x4E, 0x20, 0x4C, 0x4D, 0x43, 0x73, 0x74, 0x61, 0x72, 0x74, 0x6D, 0x65, 0x61, 0x73, 0x03 };
 
             NetworkStreamResult status;
-            if (clientSocket.Connected)
-            {
-                try
-                {
+            if (clientSocket.Connected) {
+                try {
                     NetworkStream serverStream = clientSocket.GetStream();
                     serverStream.Write(cmd, 0, cmd.Length);
                     status = NetworkStreamResult.STARTED;
-                }
-                catch (TimeoutException) { status = NetworkStreamResult.TIMEOUT; this.Disconnect(); return status; }
-                catch (SystemException) { status = NetworkStreamResult.ERROR; this.Disconnect(); return status; }
-            }
-            else
-            {
+                } catch (TimeoutException) { status = NetworkStreamResult.TIMEOUT; this.Disconnect(); return status; } catch (SystemException) { status = NetworkStreamResult.ERROR; this.Disconnect(); return status; }
+            } else {
                 status = NetworkStreamResult.CLIENT_NOT_CONNECTED;
             }
 
@@ -189,24 +162,17 @@ namespace LMS1XX
         /// Start the laser and (unless in Standby mode) the motor of the the device.
         /// </summary>
         /// <returns></returns>
-        public async Task<NetworkStreamResult> StartAsync()
-        {
+        public async Task<NetworkStreamResult> StartAsync() {
             byte[] cmd = new byte[18] { 0x02, 0x73, 0x4D, 0x4E, 0x20, 0x4C, 0x4D, 0x43, 0x73, 0x74, 0x61, 0x72, 0x74, 0x6D, 0x65, 0x61, 0x73, 0x03 };
 
             NetworkStreamResult status;
-            if (clientSocket.Connected)
-            {
-                try
-                {
+            if (clientSocket.Connected) {
+                try {
                     NetworkStream serverStream = clientSocket.GetStream();
                     await serverStream.WriteAsync(cmd, 0, cmd.Length);
                     status = NetworkStreamResult.STARTED;
-                }
-                catch (TimeoutException) { status = NetworkStreamResult.TIMEOUT; this.Disconnect(); return status; }
-                catch (SystemException) { status = NetworkStreamResult.ERROR; this.Disconnect(); return status; }
-            }
-            else
-            {
+                } catch (TimeoutException) { status = NetworkStreamResult.TIMEOUT; this.Disconnect(); return status; } catch (SystemException) { status = NetworkStreamResult.ERROR; this.Disconnect(); return status; }
+            } else {
                 status = NetworkStreamResult.CLIENT_NOT_CONNECTED;
             }
 
@@ -219,25 +185,18 @@ namespace LMS1XX
         /// Shut off the laser and stop the motor of the the device.
         /// </summary>
         /// <returns></returns>
-        public NetworkStreamResult Stop()
-        {
+        public NetworkStreamResult Stop() {
             byte[] cmd = new byte[17] { 0x02, 0x73, 0x4D, 0x4E, 0x20, 0x4C, 0x4D, 0x43, 0x73, 0x74, 0x6F, 0x70, 0x6D, 0x65, 0x61, 0x73, 0x03 };
 
             NetworkStreamResult status;
-            if (clientSocket.Connected)
-            {
-                try
-                {
+            if (clientSocket.Connected) {
+                try {
                     NetworkStream serverStream = clientSocket.GetStream();
 
                     serverStream.Write(cmd, 0, cmd.Length);
                     status = NetworkStreamResult.STOPPED;
-                }
-                catch (TimeoutException) { status = NetworkStreamResult.TIMEOUT; this.Disconnect(); return status; }
-                catch (SystemException) { status = NetworkStreamResult.ERROR; this.Disconnect(); return status; }
-            }
-            else
-            {
+                } catch (TimeoutException) { status = NetworkStreamResult.TIMEOUT; this.Disconnect(); return status; } catch (SystemException) { status = NetworkStreamResult.ERROR; this.Disconnect(); return status; }
+            } else {
                 status = NetworkStreamResult.CLIENT_NOT_CONNECTED;
             }
 
@@ -248,25 +207,18 @@ namespace LMS1XX
         /// Shut off the laser and stop the motor of the the device.
         /// </summary>
         /// <returns></returns>
-        public async Task<NetworkStreamResult> StopAsync()
-        {
+        public async Task<NetworkStreamResult> StopAsync() {
             byte[] cmd = new byte[17] { 0x02, 0x73, 0x4D, 0x4E, 0x20, 0x4C, 0x4D, 0x43, 0x73, 0x74, 0x6F, 0x70, 0x6D, 0x65, 0x61, 0x73, 0x03 };
 
             NetworkStreamResult status;
-            if (clientSocket.Connected)
-            {
-                try
-                {
+            if (clientSocket.Connected) {
+                try {
                     NetworkStream serverStream = clientSocket.GetStream();
 
                     await serverStream.WriteAsync(cmd, 0, cmd.Length);
                     status = NetworkStreamResult.STOPPED;
-                }
-                catch (TimeoutException) { status = NetworkStreamResult.TIMEOUT; this.Disconnect(); return status; }
-                catch (SystemException) { status = NetworkStreamResult.ERROR; this.Disconnect(); return status; }
-            }
-            else
-            {
+                } catch (TimeoutException) { status = NetworkStreamResult.TIMEOUT; this.Disconnect(); return status; } catch (SystemException) { status = NetworkStreamResult.ERROR; this.Disconnect(); return status; }
+            } else {
                 status = NetworkStreamResult.CLIENT_NOT_CONNECTED;
             }
 
@@ -280,10 +232,8 @@ namespace LMS1XX
         /// </summary>
         /// <param name="streamCommand"></param>
         /// <returns></returns>
-        public byte[] ExecuteRaw(byte[] streamCommand)
-        {
-            try
-            {
+        public byte[] ExecuteRaw(byte[] streamCommand) {
+            try {
                 NetworkStream serverStream = clientSocket.GetStream();
                 serverStream.Write(streamCommand, 0, streamCommand.Length);
 
@@ -293,17 +243,14 @@ namespace LMS1XX
                 serverStream.Read(inStream, 0, (int)clientSocket.ReceiveBufferSize);
 
                 return inStream;
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
+                Console.Write(ex);
                 return null;
             }
         }
 
-        public async Task<byte[]> ExecuteRawAsync(byte[] streamCommand)
-        {
-            try
-            {
+        public async Task<byte[]> ExecuteRawAsync(byte[] streamCommand) {
+            try {
                 NetworkStream serverStream = clientSocket.GetStream();
                 await serverStream.WriteAsync(streamCommand, 0, streamCommand.Length);
                 await serverStream.FlushAsync();
@@ -312,30 +259,25 @@ namespace LMS1XX
                 await serverStream.ReadAsync(inStream, 0, (int)clientSocket.ReceiveBufferSize);
 
                 return inStream;
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 return null;
             }
         }
         #endregion ExecuteRaw
 
         #region SetAccessMode
-        public struct SetAccessModeResult
-        {
+        public struct SetAccessModeResult {
             public byte[] RawData;
         }
 
-        public SetAccessModeResult SetAccessMode()
-        {
+        public SetAccessModeResult SetAccessMode() {
             SetAccessModeResult result;
             byte[] command = new byte[] { 0x02, 0x73, 0x41, 0x4E, 0x20, 0x53, 0x65, 0x74, 0x41, 0x63, 0x63, 0x65, 0x73, 0x73, 0x4D, 0x6F, 0x64, 0x65, 0x20, 0x31, 0x03 };
             result.RawData = this.ExecuteRaw(command);
             return result;
         }
 
-        public async Task<SetAccessModeResult> SetAccessModeAsync()
-        {
+        public async Task<SetAccessModeResult> SetAccessModeAsync() {
             SetAccessModeResult result;
             byte[] command = new byte[] { 0x02, 0x73, 0x41, 0x4E, 0x20, 0x53, 0x65, 0x74, 0x41, 0x63, 0x63, 0x65, 0x73, 0x73, 0x4D, 0x6F, 0x64, 0x65, 0x20, 0x31, 0x03 };
             result.RawData = await this.ExecuteRawAsync(command);
@@ -344,8 +286,7 @@ namespace LMS1XX
         #endregion SetAccessMode
 
         #region Login
-        public struct LoginResponse
-        {
+        public struct LoginResponse {
             public bool IsError;
             public Exception ErrorException;
             public byte[] RawData;
@@ -354,8 +295,7 @@ namespace LMS1XX
             public string Command;
             public bool ChangedUserLevel;
 
-            public LoginResponse(byte[] rawData)
-            {
+            public LoginResponse(byte[] rawData) {
                 IsError = true;
                 ErrorException = null;
                 RawData = rawData;
@@ -366,8 +306,7 @@ namespace LMS1XX
             }
         }
 
-        public LoginResponse Login(UserLevel userLevel)
-        {
+        public LoginResponse Login(UserLevel userLevel) {
             // Command type + command + space
             byte[] command = new byte[] { 0x02, 0x73, 0x4D, 0x4E, 0x20, 0x53, 0x65, 0x74, 0x41, 0x63, 0x63, 0x65, 0x73, 0x73, 0x4D, 0x6F, 0x64, 0x65, 0x20 };
             byte[] selectedLevel = null;
@@ -380,8 +319,7 @@ namespace LMS1XX
             byte[] terminator = new byte[] { 0x03 };
 
             // Sets selectedLevel according to user choice. The space is included after userLevel (0x20)
-            switch (userLevel)
-            {
+            switch (userLevel) {
                 case UserLevel.MAINTENANCE:
                     selectedLevel = new byte[] { 0x30, 0x32, 0x20 };
                     selectedPassword = maintenancePassword;
@@ -403,30 +341,23 @@ namespace LMS1XX
             byte[] finalCommand = command.Concat(selectedLevel).Concat(selectedPassword).Concat(terminator).ToArray();
 
 
-            if (clientSocket.Connected)
-            {
+            if (clientSocket.Connected) {
                 byte[] rawData = null;
-                try
-                {
+                try {
                     rawData = this.ExecuteRaw(finalCommand);
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     return new LoginResponse() { IsError = true, ErrorException = ex };
                 }
 
-                if (rawData != null)
-                {
+                if (rawData != null) {
                     LoginResponse result = new LoginResponse(rawData);
                     result.IsError = false;
                     result.ErrorException = null;
 
                     string[] blocs = result.RawDataString.Split(new string[] { " " }, StringSplitOptions.None);
 
-                    for(int i = 0; i < 3; i++)
-                    {
-                        switch(i)
-                        {
+                    for (int i = 0; i < 3; i++) {
+                        switch (i) {
                             case 0: result.CommandType = blocs[i]; break;
                             case 1: result.Command = blocs[i]; break;
                             case 2: result.ChangedUserLevel = blocs[i] == "1"; break;
@@ -434,14 +365,10 @@ namespace LMS1XX
                     }
 
                     return result;
-                }
-                else
-                {
+                } else {
                     return new LoginResponse() { IsError = true, ErrorException = new Exception("Raw data is null") };
                 }
-            }
-            else
-            {
+            } else {
                 return new LoginResponse() { IsError = true, ErrorException = new Exception("Socket is not connected") };
             }
         }
@@ -450,8 +377,7 @@ namespace LMS1XX
 
         #region ScanDataResult
 
-        public struct LMDScandataResult
-        {
+        public struct LMDScandataResult {
             public bool IsError;
             public Exception ErrorException;
             public byte[] RawData;
@@ -483,8 +409,7 @@ namespace LMS1XX
             public int? AmountOfData;
             public List<double> DistancesData;
 
-            public LMDScandataResult(byte[] rawData)
-            {
+            public LMDScandataResult(byte[] rawData) {
                 IsError = true;
                 ErrorException = null;
                 RawData = rawData;
@@ -525,24 +450,18 @@ namespace LMS1XX
         /// Asking the device for the measurement values of the last valid scan. The device will respond, even if it is not running at the moment.
         /// </remarks>
         /// <returns></returns>
-        public LMDScandataResult LMDScandata()
-        {
+        public LMDScandataResult LMDScandata() {
             byte[] command = new byte[] { 0x02, 0x73, 0x52, 0x4E, 0x20, 0x4C, 0x4D, 0x44, 0x73, 0x63, 0x61, 0x6E, 0x64, 0x61, 0x74, 0x61, 0x03 };
 
-            if (clientSocket.Connected)
-            {
+            if (clientSocket.Connected) {
                 byte[] rawData = null;
-                try
-                {
+                try {
                     rawData = this.ExecuteRaw(command);
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     return new LMDScandataResult() { IsError = true, ErrorException = ex };
                 }
 
-                if (rawData != null)
-                {
+                if (rawData != null) {
                     LMDScandataResult result = new LMDScandataResult(rawData);
                     result.IsError = false;
                     result.ErrorException = null;
@@ -551,18 +470,13 @@ namespace LMS1XX
                     int dataBlocCounter = 0;
                     string dataBloc = String.Empty;
 
-                    while (dataBlocCounter < 28)
-                    {
+                    while (dataBlocCounter < 28) {
                         dataIndex++;
-                        if ((dataIndex < result.RawDataString.Length) && !(result.RawDataString[dataIndex].ToString() == " "))
-                        {
+                        if ((dataIndex < result.RawDataString.Length) && !(result.RawDataString[dataIndex].ToString() == " ")) {
                             dataBloc += result.RawDataString[dataIndex];
-                        }
-                        else
-                        {
+                        } else {
                             ++dataBlocCounter;
-                            switch (dataBlocCounter)
-                            {
+                            switch (dataBlocCounter) {
                                 case 1: result.CommandType = dataBloc; break;
                                 case 2: result.Command = dataBloc; break;
                                 case 3: result.VersionNumber = int.Parse(dataBloc, System.Globalization.NumberStyles.HexNumber); break;
@@ -598,15 +512,11 @@ namespace LMS1XX
                     }
 
                     dataBloc = String.Empty;
-                    while (dataBlocCounter < result.AmountOfData + 28)
-                    {
+                    while (dataBlocCounter < result.AmountOfData + 28) {
                         ++dataIndex;
-                        if (!(result.RawDataString[dataIndex].ToString() == " "))
-                        {
+                        if (!(result.RawDataString[dataIndex].ToString() == " ")) {
                             dataBloc += result.RawDataString[dataIndex];
-                        }
-                        else
-                        {
+                        } else {
                             result.DistancesData.Add(Convert.ToDouble(int.Parse(dataBloc, System.Globalization.NumberStyles.HexNumber)) / 1000);
                             dataBloc = String.Empty;
                             ++dataBlocCounter;
@@ -614,11 +524,9 @@ namespace LMS1XX
                     }
 
                     return result;
-                }
-                else
+                } else
                     return new LMDScandataResult() { IsError = true, ErrorException = new Exception("Raw data is null.") };
-            }
-            else
+            } else
                 return new LMDScandataResult() { IsError = true, ErrorException = new Exception("Client socket not connected.") };
         }
 
@@ -629,24 +537,18 @@ namespace LMS1XX
         /// Asking the device for the measurement values of the last valid scan. The device will respond, even if it is not running at the moment.
         /// </remarks>
         /// <returns></returns>
-        public async Task<LMDScandataResult> LMDScandataAsync()
-        {
+        public async Task<LMDScandataResult> LMDScandataAsync() {
             byte[] command = new byte[] { 0x02, 0x73, 0x52, 0x4E, 0x20, 0x4C, 0x4D, 0x44, 0x73, 0x63, 0x61, 0x6E, 0x64, 0x61, 0x74, 0x61, 0x03 };
 
-            if (clientSocket.Connected)
-            {
+            if (clientSocket.Connected) {
                 byte[] rawData = null;
-                try
-                {
+                try {
                     rawData = await this.ExecuteRawAsync(command);
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     return new LMDScandataResult() { IsError = true, ErrorException = ex };
                 }
 
-                if (rawData != null)
-                {
+                if (rawData != null) {
                     LMDScandataResult result = new LMDScandataResult(rawData);
                     result.IsError = false;
                     result.ErrorException = null;
@@ -655,18 +557,13 @@ namespace LMS1XX
                     int dataBlocCounter = 0;
                     string dataBloc = String.Empty;
 
-                    while (dataBlocCounter < 28)
-                    {
+                    while (dataBlocCounter < 28) {
                         dataIndex++;
-                        if ((dataIndex < result.RawDataString.Length) && !(result.RawDataString[dataIndex].ToString() == " "))
-                        {
+                        if ((dataIndex < result.RawDataString.Length) && !(result.RawDataString[dataIndex].ToString() == " ")) {
                             dataBloc += result.RawDataString[dataIndex];
-                        }
-                        else
-                        {
+                        } else {
                             ++dataBlocCounter;
-                            switch (dataBlocCounter)
-                            {
+                            switch (dataBlocCounter) {
                                 case 1: result.CommandType = dataBloc; break;
                                 case 2: result.Command = dataBloc; break;
                                 case 3: result.VersionNumber = int.Parse(dataBloc, System.Globalization.NumberStyles.HexNumber); break;
@@ -703,15 +600,11 @@ namespace LMS1XX
                     }
 
                     dataBloc = String.Empty;
-                    while (dataBlocCounter < result.AmountOfData + 28)
-                    {
+                    while (dataBlocCounter < result.AmountOfData + 28) {
                         ++dataIndex;
-                        if (!(result.RawDataString[dataIndex].ToString() == " "))
-                        {
+                        if (!(result.RawDataString[dataIndex].ToString() == " ")) {
                             dataBloc += result.RawDataString[dataIndex];
-                        }
-                        else
-                        {
+                        } else {
                             result.DistancesData.Add(Convert.ToDouble(int.Parse(dataBloc, System.Globalization.NumberStyles.HexNumber)) / 1000);
                             dataBloc = String.Empty;
                             ++dataBlocCounter;
@@ -719,26 +612,22 @@ namespace LMS1XX
                     }
 
                     return result;
-                }
-                else
+                } else
                     return new LMDScandataResult() { IsError = true, ErrorException = new Exception("Raw data is null.") };
-            }
-            else
+            } else
                 return new LMDScandataResult() { IsError = true, ErrorException = new Exception("Client socket not connected.") };
         }
 
         #endregion ScanDataResult
 
         #region Reboot
-        public struct RebootResponse
-        {
+        public struct RebootResponse {
             public bool IsError;
             public Exception ErrorException;
             public byte[] RawData;
             public string RawDataString;
 
-            public RebootResponse(byte[] rawData)
-            {
+            public RebootResponse(byte[] rawData) {
                 IsError = true;
                 ErrorException = null;
                 RawData = null;
@@ -751,42 +640,33 @@ namespace LMS1XX
         /// </summary>
         /// <remarks>Only works in AUTHORIZEDCLIENT and  SERVICE user levels</remarks>
         /// <returns></returns>
-        public RebootResponse Reboot()
-        {
+        public RebootResponse Reboot() {
             byte[] command = new byte[] { 0x02, 0x73, 0x4D, 0x4E, 0x20, 0x6D, 0x53, 0x43, 0x72, 0x65, 0x62, 0x6F, 0x6F, 0x74, 0x03 };
 
-            if (clientSocket.Connected)
-            {
+            if (clientSocket.Connected) {
                 byte[] rawData = null;
-                try
-                {
+                try {
                     rawData = this.ExecuteRaw(command);
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     return new RebootResponse() { IsError = true, ErrorException = ex };
                 }
 
-                if (rawData != null)
-                {
+                if (rawData != null) {
                     RebootResponse result = new RebootResponse(rawData);
                     result.IsError = false;
                     result.ErrorException = null;
 
                     return result;
-                }
-                else
+                } else
                     return new RebootResponse() { IsError = true, ErrorException = new Exception("Raw Data is null") };
-            }
-            else
+            } else
                 return new RebootResponse() { IsError = true, ErrorException = new Exception("Client socket not connected.") };
         }
         #endregion Reboot
 
         #region SetScanConfiguration
 
-        public struct SetScanConfigurationResult
-        {
+        public struct SetScanConfigurationResult {
             public bool IsError;
             public Exception ErrorException;
             public byte[] RawData;
@@ -800,8 +680,7 @@ namespace LMS1XX
             public float? StartAngle;
             public float? StopAngle;
 
-            public SetScanConfigurationResult(byte[] rawData)
-            {
+            public SetScanConfigurationResult(byte[] rawData) {
                 IsError = true;
                 ErrorException = null;
                 RawData = rawData;
@@ -817,8 +696,7 @@ namespace LMS1XX
             }
         }
 
-        public SetScanConfigurationResult SetScanConfiguration(ScanFrequency scanFrequency, AngularResolution angularResolution)
-        {
+        public SetScanConfigurationResult SetScanConfiguration(ScanFrequency scanFrequency, AngularResolution angularResolution) {
             // Main command fragment, with STX and final space
             byte[] command = new byte[] { 0x02, 0x73, 0x4D, 0x4E, 0x20, 0x6D, 0x4C, 0x4D, 0x50, 0x73, 0x65, 0x74, 0x73, 0x63, 0x61, 0x6E, 0x63, 0x66, 0x67, 0x20 };
             byte[] chosenScanFrequency = null;
@@ -830,8 +708,7 @@ namespace LMS1XX
             // Stop angle fragment + ETX
             byte[] stopAngle = new byte[] { 0x2B, 0x32, 0x32, 0x35, 0x30, 0x30, 0x30, 0x30, 0x03 };
 
-            switch (scanFrequency)
-            {
+            switch (scanFrequency) {
                 case ScanFrequency.TWENTY_FIVE_HERTZ:
                     // +2500d + space (0x20)
                     chosenScanFrequency = new byte[] { 0x2B, 0x32, 0x35, 0x30, 0x30, 0x20 };
@@ -844,8 +721,7 @@ namespace LMS1XX
                     break;
             }
 
-            switch (angularResolution)
-            {
+            switch (angularResolution) {
                 case AngularResolution.ZERO_POINT_TWENTY_FIVE_DEGREES:
                     // +2500d + space (0x20)
                     chosenAngularResolution = new byte[] { 0x2B, 0x32, 0x35, 0x30, 0x30, 0x20 };
@@ -861,30 +737,23 @@ namespace LMS1XX
             // Build final command
             byte[] finalCommand = command.Concat(chosenScanFrequency).Concat(sectors).Concat(chosenAngularResolution).Concat(startAngle).Concat(stopAngle).ToArray();
 
-            if (clientSocket.Connected)
-            {
+            if (clientSocket.Connected) {
                 byte[] rawData = null;
-                try
-                {
+                try {
                     rawData = this.ExecuteRaw(finalCommand);
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     return new SetScanConfigurationResult() { IsError = true, ErrorException = ex };
                 }
 
-                if (rawData != null)
-                {
+                if (rawData != null) {
                     SetScanConfigurationResult result = new SetScanConfigurationResult(rawData);
                     result.IsError = false;
                     result.ErrorException = null;
 
                     string[] blocs = result.RawDataString.Split(new string[] { " " }, StringSplitOptions.None);
 
-                    for(int i = 0; i < 8; i++)
-                    {
-                        switch(i)
-                        {
+                    for (int i = 0; i < 8; i++) {
+                        switch (i) {
                             case (0): result.CommandType = blocs[i]; break;
                             case (1): result.Command = blocs[i]; break;
                             case (2): result.StatusCode = (SetScanConfigStatusCode)int.Parse(blocs[i]); break;
@@ -892,19 +761,15 @@ namespace LMS1XX
                             case (4): result.NumberOfActiveSectors = Convert.ToSingle(int.Parse(blocs[i], System.Globalization.NumberStyles.HexNumber)); break;
                             case (5): result.AngularResolution = Convert.ToSingle(int.Parse(blocs[i], System.Globalization.NumberStyles.HexNumber)); break;
                             case (6): result.StartAngle = Convert.ToSingle(int.Parse(blocs[i], System.Globalization.NumberStyles.HexNumber)); break;
-                            // case (7): result.StopAngle = Convert.ToSingle(int.Parse(blocs[i], System.Globalization.NumberStyles.HexNumber)); break;
+                                // case (7): result.StopAngle = Convert.ToSingle(int.Parse(blocs[i], System.Globalization.NumberStyles.HexNumber)); break;
                         }
                     }
 
                     return result;
-                }
-                else
-                {
+                } else {
                     return new SetScanConfigurationResult() { IsError = true, ErrorException = new Exception("Raw data is null") };
                 }
-            }
-            else
-            {
+            } else {
                 return new SetScanConfigurationResult() { IsError = true, ErrorException = new Exception("Socket is not connected") };
             }
         }
@@ -913,8 +778,7 @@ namespace LMS1XX
 
         #region ReadDeviceState
 
-        public struct ReadDeviceStateResult
-        {
+        public struct ReadDeviceStateResult {
             public bool IsError;
             public Exception ErrorException;
             public byte[] RawData;
@@ -923,8 +787,7 @@ namespace LMS1XX
             public String Command;
             public StatusCode Status;
 
-            public ReadDeviceStateResult(byte[] rawData)
-            {
+            public ReadDeviceStateResult(byte[] rawData) {
                 IsError = true;
                 ErrorException = null;
                 RawData = rawData;
@@ -940,34 +803,26 @@ namespace LMS1XX
         /// </summary>
         /// <remarks>0 = Busy, 1 = Ready, 2 = Error</remarks>
         /// <returns></returns>
-        public ReadDeviceStateResult ReadDeviceState()
-        {
+        public ReadDeviceStateResult ReadDeviceState() {
             byte[] command = new byte[] { 0x02, 0x73, 0x52, 0x4E, 0x20, 0x53, 0x43, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x73, 0x74, 0x61, 0x74, 0x65, 0x03 };
 
-            if(clientSocket.Connected)
-            {
+            if (clientSocket.Connected) {
                 byte[] rawData = null;
-                try
-                {
+                try {
                     rawData = this.ExecuteRaw(command);
-                }
-                catch(Exception ex)
-                {
+                } catch (Exception ex) {
                     return new ReadDeviceStateResult() { IsError = true, ErrorException = ex };
                 }
 
-                if(rawData != null)
-                {
+                if (rawData != null) {
                     ReadDeviceStateResult result = new ReadDeviceStateResult(rawData);
                     result.IsError = false;
                     result.ErrorException = null;
 
                     string[] blocs = result.RawDataString.Split(new string[] { " " }, StringSplitOptions.None);
 
-                    for(int i = 0; i < 3; i++)
-                    {
-                        switch(i)
-                        {
+                    for (int i = 0; i < 3; i++) {
+                        switch (i) {
                             case 0: result.CommandType = blocs[i]; break;
                             case 1: result.Command = blocs[i]; break;
                             case 2: result.Status = (StatusCode)int.Parse(blocs[i]); break;
@@ -975,14 +830,10 @@ namespace LMS1XX
                     }
 
                     return result;
-                }
-                else
-                {
+                } else {
                     return new ReadDeviceStateResult() { IsError = true, ErrorException = new Exception("Raw data is null") };
                 }
-            }
-            else
-            {
+            } else {
                 return new ReadDeviceStateResult() { IsError = true, ErrorException = new Exception("Socket is not connected") };
             }
         }
@@ -992,8 +843,7 @@ namespace LMS1XX
 
         #region ReadDeviceTemperature
 
-        public struct ReadDeviceTemperatureResponse
-        {
+        public struct ReadDeviceTemperatureResponse {
             public bool IsError;
             public Exception ErrorException;
             public byte[] RawData;
@@ -1002,8 +852,7 @@ namespace LMS1XX
             public String Command;
             public float Temperature;
 
-            public ReadDeviceTemperatureResponse(byte[] rawData)
-            {
+            public ReadDeviceTemperatureResponse(byte[] rawData) {
                 IsError = true;
                 ErrorException = null;
                 RawData = rawData;
@@ -1018,34 +867,26 @@ namespace LMS1XX
         /// Reads LIDAR's temperature
         /// </summary>
         /// <returns></returns>
-        public ReadDeviceTemperatureResponse ReadDeviceTemperature()
-        {
+        public ReadDeviceTemperatureResponse ReadDeviceTemperature() {
             byte[] command = { 0x02, 0x73, 0x52, 0x4E, 0x20, 0x4F, 0x50, 0x63, 0x75, 0x72, 0x74, 0x6D, 0x70, 0x64, 0x65, 0x76, 0x03 };
 
-            if(clientSocket.Connected)
-            {
+            if (clientSocket.Connected) {
                 byte[] rawData = null;
-                try
-                {
+                try {
                     rawData = this.ExecuteRaw(command);
-                }
-                catch(Exception ex)
-                {
+                } catch (Exception ex) {
                     return new ReadDeviceTemperatureResponse() { IsError = true, ErrorException = ex };
                 }
 
-                if(rawData != null)
-                {
+                if (rawData != null) {
                     ReadDeviceTemperatureResponse result = new ReadDeviceTemperatureResponse(rawData);
                     result.IsError = false;
                     result.ErrorException = null;
 
                     string[] blocs = result.RawDataString.Split(new string[] { " " }, StringSplitOptions.None);
 
-                    for(int i = 0; i < 3; i++)
-                    {
-                        switch (i)
-                        {
+                    for (int i = 0; i < 3; i++) {
+                        switch (i) {
                             case 0: result.CommandType = blocs[i]; break;
                             case 1: result.Command = blocs[i]; break;
                             case 2: result.Temperature = ConvertHexToSingle(blocs[i]); break;
@@ -1053,14 +894,10 @@ namespace LMS1XX
                     }
 
                     return result;
-                }
-                else
-                {
+                } else {
                     return new ReadDeviceTemperatureResponse() { IsError = true, ErrorException = new Exception("Raw data is null") };
                 }
-            }
-            else
-            {
+            } else {
                 return new ReadDeviceTemperatureResponse() { IsError = true, ErrorException = new Exception("Socket is not connected") };
             }
         }
@@ -1071,62 +908,45 @@ namespace LMS1XX
 
         #region Relevé Asynchrone des données du Capteur
 
-        public async Task<LMDScandataResult> LMDScandataFullModeAsync()
-        {
-            try
-            {
+        public async Task<LMDScandataResult> LMDScandataFullModeAsync() {
+            try {
                 LMDScandataResult scandataResult;
 
                 var connectionResult = await this.ConnectAsync();
-                if (connectionResult == SocketConnectionResult.CONNECTED)
-                {
+                if (connectionResult == SocketConnectionResult.CONNECTED) {
                     var networkStreamResult = await this.StartAsync();
-                    if (networkStreamResult == NetworkStreamResult.STARTED)
-                    {
+                    if (networkStreamResult == NetworkStreamResult.STARTED) {
                         scandataResult = await this.LMDScandataAsync(); // TO FIX: First call doesn't return data ?
                         scandataResult = await this.LMDScandataAsync(); // TO FIX: Second call return datas
 
-                        if (!scandataResult.IsError)
-                        {
+                        if (!scandataResult.IsError) {
                             networkStreamResult = await this.StopAsync();
-                            if (networkStreamResult == NetworkStreamResult.STOPPED)
-                            {
+                            if (networkStreamResult == NetworkStreamResult.STOPPED) {
                                 this.Disconnect();
                                 return scandataResult;
+                            } else {
+                                this.Disconnect();
+                                scandataResult.IsError = true;
+                                scandataResult.ErrorException = new Exception(string.Format("{0} Network stream improperly stopped.", scandataResult.ErrorException));
+                                return scandataResult;
                             }
-                            else
-                            {
+                        } else {
+                            networkStreamResult = await this.StopAsync();
+                            if (networkStreamResult == NetworkStreamResult.STOPPED) {
+                                this.Disconnect();
+                                return scandataResult;
+                            } else {
                                 this.Disconnect();
                                 scandataResult.IsError = true;
                                 scandataResult.ErrorException = new Exception(string.Format("{0} Network stream improperly stopped.", scandataResult.ErrorException));
                                 return scandataResult;
                             }
                         }
-                        else
-                        {
-                            networkStreamResult = await this.StopAsync();
-                            if (networkStreamResult == NetworkStreamResult.STOPPED)
-                            {
-                                this.Disconnect();
-                                return scandataResult;
-                            }
-                            else
-                            {
-                                this.Disconnect();
-                                scandataResult.IsError = true;
-                                scandataResult.ErrorException = new Exception(string.Format("{0} Network stream improperly stopped.", scandataResult.ErrorException));
-                                return scandataResult;
-                            }
-                        }
-                    }
-                    else
+                    } else
                         return new LMDScandataResult() { IsError = true, ErrorException = new Exception("Network stream not started.") };
-                }
-                else
+                } else
                     return new LMDScandataResult() { IsError = true, ErrorException = new Exception("Client socket not connected.") };
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 return new LMDScandataResult() { IsError = true, ErrorException = ex };
             }
         }
@@ -1141,23 +961,18 @@ namespace LMS1XX
         /// </summary>
         /// <param name="hexVal"></param>
         /// <returns></returns>
-        private static Single ConvertHexToSingle(string hexVal)
-        {
-            try
-            {
+        private static Single ConvertHexToSingle(string hexVal) {
+            try {
                 int i = 0, j = 0;
                 byte[] bArray = new byte[4];
-                for (i = 0; i <= hexVal.Length - 1; i += 2)
-                {
+                for (i = 0; i <= hexVal.Length - 1; i += 2) {
                     bArray[j] = Byte.Parse(hexVal[i].ToString() + hexVal[i + 1].ToString(), System.Globalization.NumberStyles.HexNumber);
                     j += 1;
                 }
                 Array.Reverse(bArray);
                 Single s = BitConverter.ToSingle(bArray, 0);
                 return (s);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 throw new FormatException("The supplied hex value is either empty or in an incorrect format.  Use the " +
                     "following format: 00000000", ex);
             }
