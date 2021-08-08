@@ -18,13 +18,14 @@ using System.Threading;
 using System.Collections;
 using Newtonsoft.Json;
 using P_F_Interface;
+using NLog;
 namespace LidarInterface {
 
     /// <summary>
     /// 主要用于标靶探测和获取标靶
     /// </summary>
     public class SingleAgv {
-
+		private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private int xoydirction;
         private double[] agvlocator;
         public double[] AgvLocator//Length =4;
@@ -872,6 +873,7 @@ namespace LidarInterface {
                 item.WriteTheLightMsg(nolist);
                 res = true;
             } catch (Exception ex) {
+				// Logger.Error(ex, "WriteText");
                 res = false;
             }
             return res;

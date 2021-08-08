@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31321.278
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P+F_Interface", "P+F_Interface.csproj", "{6DD689AC-207B-4CEA-AD21-CEA3BB797DCF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P+F_Interface", "src\P+F_Interface.Net45\P+F_Interface.csproj", "{6DD689AC-207B-4CEA-AD21-CEA3BB797DCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PF_InterfaceTests", "tests\P+F_Interface.Net45\P+F_InterfaceTests.csproj", "{57999929-BA76-42B3-BCCE-9C50C75968A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{6DD689AC-207B-4CEA-AD21-CEA3BB797DCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6DD689AC-207B-4CEA-AD21-CEA3BB797DCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6DD689AC-207B-4CEA-AD21-CEA3BB797DCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57999929-BA76-42B3-BCCE-9C50C75968A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57999929-BA76-42B3-BCCE-9C50C75968A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57999929-BA76-42B3-BCCE-9C50C75968A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57999929-BA76-42B3-BCCE-9C50C75968A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

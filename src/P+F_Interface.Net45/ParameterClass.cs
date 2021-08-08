@@ -12,12 +12,14 @@ using System.Linq;
 using System.IO;
 using System.Windows.Forms;
 using System.Threading;
+using NLog;
 namespace P_F_Interface {
 
     /// <summary>
     /// Description of PrarmeterClass.
     /// </summary>
     public class ParameterClass {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public ParameterClass() {
 
         }
@@ -70,6 +72,7 @@ namespace P_F_Interface {
                 file.Flush();
                 file.Close();
             } catch (Exception ex) {
+                Logger.Error(ex, "config error!");
                 return false;
             }
             return true;

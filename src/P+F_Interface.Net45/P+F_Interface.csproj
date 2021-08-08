@@ -35,9 +35,14 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32bit>false</Prefer32bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32bit>false</Prefer32bit>
+    <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <!-- <Reference Include="AxInterop.TeeChart">
@@ -127,6 +132,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="8.0.3" />
     <PackageReference Include="NLog" Version="4.7.10" />
+    <PackageReference Include="NLog.Config" Version="4.7.10" />
     <PackageReference Include="Steema.TeeChart.NET" Version="4.2021.7.22" />
     <PackageReference Include="TeeChart" Version="2.4.0" />
   </ItemGroup>

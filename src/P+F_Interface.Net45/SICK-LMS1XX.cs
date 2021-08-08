@@ -34,9 +34,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Linq;
+using NLog;
 
 namespace LMS1XX {
     public class LMS1XX {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         #region Enums
 
         public enum SocketConnectionResult { CONNECTED = 0, CONNECT_TIMEOUT = 1, CONNECT_ERROR = 2, DISCONNECTED = 3, DISCONNECT_TIMEOUT = 4, DISCONNECT_ERROR = 5 }
@@ -244,7 +246,7 @@ namespace LMS1XX {
 
                 return inStream;
             } catch (Exception ex) {
-                Console.Write(ex);
+                Logger.Error(ex, "ExecuteRaw Error!");
                 return null;
             }
         }
@@ -260,6 +262,7 @@ namespace LMS1XX {
 
                 return inStream;
             } catch (Exception ex) {
+                Logger.Error(ex, "ExecuteRawAsync Error!");
                 return null;
             }
         }
