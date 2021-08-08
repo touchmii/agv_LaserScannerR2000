@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
 using System.Data;
 using Steema.TeeChart;
 using System.Net;

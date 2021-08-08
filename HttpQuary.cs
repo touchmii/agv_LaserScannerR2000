@@ -20,9 +20,7 @@ using System .Text ;
 using Microsoft .Win32 ;
 using System .IO ;
 using System .Xml ;
-using System .Net .Sockets;
 using System .Net .NetworkInformation ;
-using System .Collections .Generic;
 using System.Collections;
 namespace P_F_Interface
 {
